@@ -50,7 +50,7 @@ kmCall(0x80485A1C + 0x10, NoteCounter_exeShowToHide);
 kmWrite32(0x80485A20 + 0x10, 0x48000064);
 kmCall(0x80485854 + 0x10, NoteCounter_declareNoteNumMaxAndMelody);
 kmCall(0x804859E0 + 0x10, NoteCounter_add);
-#elif
+#else
 kmCall(0x804857E8, NoteCounter_init);
 kmCall(0x80485AF4, NoteCounter_exeHideToShow);
 kmWrite32(0x80485AF8, 0x48000064);
