@@ -11,14 +11,19 @@ NoteCounterExt::NoteCounterExt(const char* pName) : NoteCounter(pName) {
 	mPaneRumbler = 0;
 }
 
+NoteCounterExt::~NoteCounterExt() {}
+
+void NoteCounterExt::control() {
+	mPaneRumbler->update();
+}
+
 NoteCounterExt* createNoteCounterExt() {
 	return new NoteCounterExt("音符カウンタ");
 }
 
-NoteCounterExt::~NoteCounterExt() {}
-void NoteCounterExt::control() {
-	mPaneRumbler->update();
-}
+kmCall(0x80471760, createNoteCounterExt);
+kmWrite32(0x80471764, 0x48000014);
+
 
 void NoteCounter_init(NoteCounterExt* pLayout, const Nerve* pInitNerve)
 {
@@ -33,17 +38,28 @@ void NoteCounter_init(NoteCounterExt* pLayout, const Nerve* pInitNerve)
 	pLayout->mPaneRumbler->mRumbleCalculator->mRumbleStrength = 8.0f;
 }
 
+kmCall(0x804857E8+REGIONOFF, NoteCounter_init);
+
+
 void NoteCounter_exeHideToShow(NoteCounterExt* pLayout)
 {
+	pLayout->mPaneRumbler->reset();
 	MR::startAnimAtFirstStep(pLayout, "Appear", 0);
 	MR::setTextBoxFormatRecursive(pLayout, "Counter", L"%02d", 0);
 }
 
+kmCall(0x80485AF4+REGIONOFF, NoteCounter_exeHideToShow);
+kmWrite32(0x80485AF8+REGIONOFF, 0x48000064);
+
+
 void NoteCounter_exeShowToHide(NoteCounterExt* pLayout)
 {
-	pLayout->mPaneRumbler->reset();
 	MR::startAnimAtFirstStep(pLayout, "End", 0);
 }
+
+kmCall(0x80485A1C+REGIONOFF, NoteCounter_exeShowToHide);
+kmWrite32(0x80485A20+REGIONOFF, 0x48000064);
+
 
 bool NoteCounter_declareNoteNumMaxAndMelody(NoteCounterExt* pLayout, const Nerve* pNerve)
 {
@@ -59,6 +75,9 @@ bool NoteCounter_declareNoteNumMaxAndMelody(NoteCounterExt* pLayout, const Nerve
 	return pLayout->isNerve(pNerve);
 }
 
+kmCall(0x80485854+REGIONOFF, NoteCounter_declareNoteNumMaxAndMelody);
+
+
 void NoteCounter_add(NoteCounterExt* pLayout)
 {
 	MR::setTextBoxFormatRecursive(pLayout, "Counter", L"%02d", pLayout->mNoteNum);
@@ -68,12 +87,4 @@ void NoteCounter_add(NoteCounterExt* pLayout)
 	pLayout->tryEndDisp();
 }
 
-kmCall(0x804857E8+REGIONOFF, NoteCounter_init);
-kmCall(0x80485AF4+REGIONOFF, NoteCounter_exeHideToShow);
-kmWrite32(0x80485AF8+REGIONOFF, 0x48000064);
-kmCall(0x80485A1C+REGIONOFF, NoteCounter_exeShowToHide);
-kmWrite32(0x80485A20+REGIONOFF, 0x48000064);
-kmCall(0x80485854+REGIONOFF, NoteCounter_declareNoteNumMaxAndMelody);
 kmCall(0x804859E0+REGIONOFF, NoteCounter_add);
-kmCall(0x80471760+REGIONOFF, createNoteCounterExt);
-kmWrite32(0x80471764+REGIONOFF, 0x48000014);
